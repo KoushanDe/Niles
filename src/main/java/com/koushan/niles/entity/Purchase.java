@@ -19,4 +19,6 @@ public class Purchase extends BaseEntity{
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "fk_user"))
     private User user;
 
+    @Column(name = "buy_price", nullable = false)
+    private Double buyPrice;
 }

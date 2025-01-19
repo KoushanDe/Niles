@@ -1,0 +1,160 @@
+/* General Body Styling */
+body {
+    background-color: #f4f4f4;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Styling */
+header {
+    background-color: #343a40;
+    color: white;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+header .btn-outline-light {
+    border: 2px solid white;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header .btn-outline-light:hover {
+    background-color: white;
+    color: #343a40;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+header form {
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+header form input {
+    border-radius: 30px;
+}
+
+header form .btn-success {
+    border-radius: 30px;
+}
+
+/* Main Section */
+main {
+    margin-top: 20px;
+    padding: 0 15px;
+}
+
+main .container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.btn-wide {
+    height: 40px;
+    width: 100%;
+}
+
+/* Product Cards */
+.card {
+    border: none;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+}
+
+.card-body {
+    padding: 20px;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #222;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.card-footer {
+    background: white;
+    border-top: 1px solid #eee;
+    padding: 10px;
+}
+
+.card-footer .btn-warning {
+    border-radius: 25px;
+    font-size: 0.9rem;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.card-footer .btn-warning:hover {
+    background-color: #e0a800;
+    transform: scale(1.05);
+}
+
+.error-image {
+    max-width: 50%;
+    height: auto;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    header .container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    header form {
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-img-top {
+        height: 200px;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .card-footer .btn-warning {
+        font-size: 0.85rem;
+    }
+}

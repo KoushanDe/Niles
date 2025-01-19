@@ -21,11 +21,13 @@ public class PurchaseDto implements Serializable {
 	private final Long id;
     private final ApparelDto apparel;
     private final LocalDate createdAt;
+    private final Double buyPrice;
 
-    public PurchaseDto(Long id, ApparelDto apparel, LocalDate createdAt) {
+    public PurchaseDto(Long id, ApparelDto apparel, LocalDate createdAt, Double buyPrice) {
         this.id = id;
         this.apparel = apparel;
         this.createdAt = createdAt;
+        this.buyPrice = buyPrice;
     }
 
     public PurchaseDto(Purchase purchase)
@@ -33,6 +35,7 @@ public class PurchaseDto implements Serializable {
         this.id = purchase.getId();
         this.apparel = new ApparelDto(purchase.getApparel());
         this.createdAt = LocalDate.from(purchase.getCreatedAt());
+        this.buyPrice = purchase.getBuyPrice();
     }
 
     @Override
@@ -42,12 +45,13 @@ public class PurchaseDto implements Serializable {
         PurchaseDto entity = (PurchaseDto) o;
         return Objects.equals(this.id, entity.id) &&
                 Objects.equals(this.apparel, entity.apparel) &&
-                Objects.equals(this.createdAt, entity.createdAt);
+                Objects.equals(this.createdAt, entity.createdAt)&&
+                Objects.equals(this.buyPrice, entity.buyPrice);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, apparel, createdAt);
+        return Objects.hash(id, apparel, createdAt, buyPrice);
     }
 
     @Override
@@ -55,6 +59,7 @@ public class PurchaseDto implements Serializable {
         return getClass().getSimpleName() + "(" +
                 "id = " + id + ", " +
                 "apparel = " + apparel + ", " +
-                "createdAt = " + createdAt + ")";
+                "createdAt = " + createdAt + ", " +
+                "buyPrice = " + buyPrice + ")";
     }
 }

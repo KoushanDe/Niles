@@ -36,17 +36,17 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authConfig) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/admin/signup/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/**").permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/home")
-                        .failureUrl("/login?error")
+                        .failureUrl("/login-error")
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -55,7 +55,10 @@ public class SecurityConfiguration {
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
-                );
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/forbidden")
+                );;
 
         http.csrf(AbstractHttpConfigurer::disable);
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));

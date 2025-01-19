@@ -1,12 +1,9 @@
 package com.koushan.niles.controller;
 
 import com.koushan.niles.dto.ApparelDto;
-import com.koushan.niles.entity.Apparel;
-import com.koushan.niles.entity.Purchase;
-import com.koushan.niles.service.ApparelService;
-import com.koushan.niles.service.DealService;
-import com.koushan.niles.service.UserService;
+import com.koushan.niles.service.*;
 import com.koushan.niles.utils.Statistics;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.ui.Model;
@@ -15,82 +12,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 @RestController
 public class MainController {
-    private final ApparelService apparelService;
-    private final DealService dealService;
-    private final UserService userService;
 
-    public MainController(ApparelService apparelService, DealService dealService, UserService userService) {
-        this.apparelService = apparelService;
-        this.dealService = dealService;
-        this.userService = userService;
+    private final ApparelFilterService apparelFilterService;
+    private final StatisticsService statisticsService;
+
+    public MainController(ApparelFilterService apparelFilterService, StatisticsService statisticsService) {
+        this.apparelFilterService = apparelFilterService;
+        this.statisticsService = statisticsService;
     }
 
     @GetMapping("/user")
-    public ModelAndView home(@RequestParam(required = false) String q, Authentication auth, Model model, HttpSession session) {
-        Statistics statistics = (Statistics) session.getAttribute("statistics");
+    public ModelAndView home(@RequestParam(required = false) String query, Authentication auth, Model model, HttpSession session) {
         User user = (User) auth.getPrincipal();
+        String username = user.getUsername();
 
-        if (statistics == null) {
-            statistics = new Statistics();
-            userService.getPurchases(user.getUsername()).stream().map(Purchase::getApparel).mapToDouble(Apparel::getPrice).forEach(statistics::update);
-            session.setAttribute("statistics", statistics);
-        }
+        Statistics statistics = statisticsService.initializeStatistics(session, username);
 
-        if (q == null || q.isEmpty()) {
-        	List<Apparel> userSpecificApparelList = apparelService.listApparel(user.getUsername());
-        	
-        	List<ApparelDto> apparelList = new ArrayList<>();
-        	
-        	for (Apparel apparel : userSpecificApparelList) {
-        		ApparelDto apparelDto = new ApparelDto (apparel);
-        		apparelDto.setDiscountedPrice(dealService.getDiscountedPrice(apparelDto.getId()));
-        		apparelList.add(apparelDto);
-        	}
-      
-            model.addAttribute("apparelList", sortAccordingToMetric(apparelList, statistics));
-        } else {
-        	List<Apparel> userSpecificApparelList = apparelService.listApparel(user.getUsername());
-        	
-        	List<ApparelDto> apparelList = new ArrayList<ApparelDto>();
-        	
-        	for (Apparel apparel : userSpecificApparelList) {
-        		if (apparel.getGenericName().toLowerCase(Locale.ROOT).startsWith(q.toLowerCase(Locale.ROOT))) {
-	        		ApparelDto apparelDto = new ApparelDto (apparel);
-	        		apparelDto.setDiscountedPrice(dealService.getDiscountedPrice(apparelDto.getId()));
-	        		apparelList.add(apparelDto);
-        		}
-        	}
-            model.addAttribute("apparelList", sortAccordingToMetric(apparelList, statistics));
-        }
+        List<ApparelDto> apparelList = apparelFilterService.getFilteredAndSortedApparel(username, query, statistics);
+
+        model.addAttribute("apparelList", apparelList);
+
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("index");
         return modelAndView;
-    }
-
-    private List<ApparelDto> sortAccordingToMetric(List<ApparelDto> apparels, Statistics statistics) {
-
-        apparels.sort((apparel1, apparel2) -> {
-            double left = statistics.getMean() - statistics.getStandardDeviation();
-            double right = statistics.getMean() + statistics.getStandardDeviation();
-            if (apparel1.getPrice() >= left && apparel1.getPrice() <= right && apparel2.getPrice() >= left && apparel2.getPrice() <= right) {
-                return Double.compare(apparel1.getPrice(), apparel2.getPrice());
-            } else if (apparel1.getPrice() >= left && apparel1.getPrice() <= right) {
-                return -1;
-            } else if (apparel2.getPrice() >= left && apparel2.getPrice() <= right) {
-                return 1;
-            } else {
-                return Double.compare(Math.abs(apparel1.getPrice() - statistics.getMean()), Math.abs(apparel2.getPrice() - statistics.getMean()));
-            }
-        });
-
-        return apparels;
     }
 }
